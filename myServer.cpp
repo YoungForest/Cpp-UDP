@@ -15,7 +15,6 @@ using namespace std;
 
 void * run(void * arg);
 
-char *semName = "/SEM";
 int count = 0;
 char buf[BUFSIZE]; /* receive buffer */
 struct sockaddr_in remaddr; /* remote address */
@@ -84,20 +83,18 @@ main(int argc, char **argv)
         printf("waiting on port %d\n", service_port);
         
         recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
-        sprintf(buf, "User-%d : %s", clients[i].id, buf);
         fprintf(f, "%s", buf);
         int i;
         for(i=0; i<clients.size(); i++) {
             if(remaddr.sin_addr.s_addr == clients[i].client_addr.sin_addr.s_addr) 
             {
                 // printf("equal\n");
-                for (int j=0; j<clients.size(); j++)
-                {
-                    clients[j].ifMess = 1;
-                }
+                sprintf(buf, "User-%d : %s", clients[i].id, buf);
                 break;
             }
-            else
+        }
+        for(i=0; i<clients.size(); i++) {
+            if(remaddr.sin_addr.s_addr != clients[i].client_addr.sin_addr.s_addr) 
             {
                 struct Client *c = &clients[i];
                 if (sendto(c->fd, buf, strlen(buf), 0, (struct sockaddr *)&c->client_addr, c->addrlen) < 0)
