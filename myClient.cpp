@@ -63,7 +63,7 @@ int main(void){
         fprintf(stderr, "inet_aton() failed\n");
         exit(1);
     }
-    printf("Connect successfully!");
+    // printf("Connect successfully!");
     time_t nowtime;
     nowtime = time(NULL);
     fprintf(f, "\nTime: %sConnected ip:port is %s:%d\n", ctime(&nowtime), server, service_port);
@@ -105,3 +105,4 @@ void * receiveMessage(void * argument)
     }
 
 }
+

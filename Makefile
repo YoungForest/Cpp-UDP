@@ -1,12 +1,12 @@
 CC = g++
-LIBS = -pthread
+LIBS = -pthread -lrt -std=c++11
 
 all: myServer myClient
 
-myServer:
+myServer: myServer.cpp
 	$(CC) myServer.cpp -o myServer $(LIBS)
 
-myClient:
+myClient: myClient.cpp
 	$(CC) myClient.cpp -o myClient $(LIBS)
 
 clean:

@@ -15,69 +15,110 @@ using namespace std;
 
 void * run(void * arg);
 
+char *semName = "/SEM";
 int count = 0;
+char buf[BUFSIZE]; /* receive buffer */
+struct sockaddr_in remaddr; /* remote address */
 
 struct Client
 {
-    struct sockaddr *client_addr;
+    struct sockaddr_in client_addr;
     int id;
-    char name;
-    struct sockaddr *dest;
+    char name[BUFSIZE];
+    char password[BUFSIZE];
+    int birthyear;
+    int birthmonth;
+    int birthday;
+    struct Client *dest;
     socklen_t addrlen;
     int fd;
+    int ifMess;
 };
+
+void m_threadSleep(int sec,int nsec)
+{
+    struct timespec sleepTime;
+    struct timespec returnTime;
+    sleepTime.tv_sec = sec;
+    sleepTime.tv_nsec = nsec;
+    nanosleep(&sleepTime, &returnTime);
+}
 
 int
 main(int argc, char **argv)
 {
+    FILE *f;
     struct sockaddr_in myaddr;  /* our address */
     int recvlen;            /* # bytes received */
     int fd;             /* our socket */
     int msgcnt = 0;         /* count # of messages we received */
-    unsigned char buf[BUFSIZE]; /* receive buffer */
+    // unsigned 
     int service_port;
     vector<Client> clients;
-    vector<int> sockets;
+
+    if((f = fopen("chat.log","a+"))==NULL)
+        printf("Error when fopen\n");
 
     printf("Which port do you want to bind?\n");
     scanf("%d", &service_port);
+
+    fprintf(f, "Listening to port %d\n", service_port);
     
-    /* bind the socket to any valid IP address and a specific port */
     memset((char *)&myaddr, 0, sizeof(myaddr));
     myaddr.sin_family = AF_INET;
     myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     myaddr.sin_port = htons(service_port);
 
-    for(int i=0; i<MAXSOCKET; i++)
-    {
-        if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         perror("cannot create socket\n");
         return 0;
-        }
-        if (bind(fd, (struct sockaddr *)&myaddr, sizeof(myaddr)) < 0) {
-            perror("bind failed");
-            return 0;
-        }
-        sockets.push_back(fd);
     }
-    /* now loop, receiving data and printing what we received */
+    if (bind(fd, (struct sockaddr *)&myaddr, sizeof(myaddr)) < 0) {
+        perror("bind failed");
+        return 0;
+    }
+    struct sockaddr_in remaddr; /* remote address */
+    socklen_t addrlen = sizeof(remaddr);        /* length of addresses */
     while(1) {
-        struct sockaddr_in remaddr; /* remote address */
         socklen_t addrlen = sizeof(remaddr);        /* length of addresses */
-        struct Client c;
         printf("waiting on port %d\n", service_port);
-        fd = sockets[sockets.size()-1];
-        sockets.pop_back();
-        c.fd = fd;
+        
         recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
-        c.client_addr = (struct sockaddr*)&remaddr;
-        c.addrlen = addrlen;
-        count++;
-        c.id = count;
-        pthread_t t;
-        printf("Connecting one more...");
-
-        pthread_create(&t, NULL, run, reinterpret_cast<void*>(&c));
+        sprintf(buf, "User-%d : %s", clients[i].id, buf);
+        fprintf(f, "%s", buf);
+        int i;
+        for(i=0; i<clients.size(); i++) {
+            if(remaddr.sin_addr.s_addr == clients[i].client_addr.sin_addr.s_addr) 
+            {
+                // printf("equal\n");
+                for (int j=0; j<clients.size(); j++)
+                {
+                    clients[j].ifMess = 1;
+                }
+                break;
+            }
+            else
+            {
+                struct Client *c = &clients[i];
+                if (sendto(c->fd, buf, strlen(buf), 0, (struct sockaddr *)&c->client_addr, c->addrlen) < 0)
+                    perror("sendto");
+            }
+        }
+        if(i == clients.size()) {
+            struct Client c;
+            c.fd = fd;
+            c.client_addr = remaddr;
+            c.addrlen = addrlen;
+            count++;
+            c.id = count;
+            c.ifMess = 0;
+            strcpy(c.name, "unamed");
+            clients.push_back(c);
+            pthread_t t;
+            printf("A new client connects.\n");
+            pthread_create(&t, NULL, run, &c);
+            pthread_join(t, NULL);
+        }
     }
     /* never exits */
 }
@@ -85,8 +126,9 @@ main(int argc, char **argv)
 void * run(void *arg)
 {
     struct Client *c = (struct Client *)arg;
-    char buf[BUFSIZE];
-    strcpy(buf, "Which person do you want to chat");
-    if (sendto(c->fd, buf, strlen(buf), 0, (struct sockaddr *)&c->dest, c->addrlen) < 0)
+    char client_buf[BUFSIZE];
+    strcpy(client_buf, "Hi, new guy! Welcome to our chat room!");
+    printf("%s\n", client_buf);
+    if (sendto(c->fd, client_buf, strlen(client_buf), 0, (struct sockaddr *)&c->client_addr, c->addrlen) < 0)
         perror("sendto");
 }
