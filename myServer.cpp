@@ -93,14 +93,6 @@ main(int argc, char **argv)
                 break;
             }
         }
-        for(i=0; i<clients.size(); i++) {
-            if(remaddr.sin_addr.s_addr != clients[i].client_addr.sin_addr.s_addr) 
-            {
-                struct Client *c = &clients[i];
-                if (sendto(c->fd, buf, strlen(buf), 0, (struct sockaddr *)&c->client_addr, c->addrlen) < 0)
-                    perror("sendto");
-            }
-        }
         if(i == clients.size()) {
             struct Client c;
             c.fd = fd;
@@ -115,6 +107,17 @@ main(int argc, char **argv)
             printf("A new client connects.\n");
             pthread_create(&t, NULL, run, &c);
             pthread_join(t, NULL);
+        }
+        else
+        {
+            for(i=0; i<clients.size(); i++) {
+                if(remaddr.sin_addr.s_addr != clients[i].client_addr.sin_addr.s_addr) 
+                {
+                    struct Client *c = &clients[i];
+                    if (sendto(c->fd, buf, strlen(buf), 0, (struct sockaddr *)&c->client_addr, c->addrlen) < 0)
+                        perror("sendto");
+                }
+            }
         }
     }
     /* never exits */

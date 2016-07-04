@@ -28,7 +28,7 @@ int main(void){
     pthread_t threadRecv;
     
     char buf[BUFLEN];    /* message buffer */
-    char server[IPLEN]; /* "123.206.52.64" */
+    char server[IPLEN]; /* "123.206.52.64" "172.16.72.79"*/
     int service_port;
 
     if((f = fopen("chat.log","a+"))==NULL)
