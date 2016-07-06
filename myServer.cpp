@@ -104,7 +104,7 @@ main(int argc, char **argv)
         }
         if((f = fopen("server.log","a+"))==NULL)
             printf("Error when fopen\n");
-        fprintf(f, "%s", buf);
+        fprintf(f, "%s\n", buf);
         fclose(f);
         // printf("clients.size() : %d\n", clients.size());
         if(i == clients.size()) {

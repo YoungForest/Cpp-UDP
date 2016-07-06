@@ -39,7 +39,6 @@ int main(void){
     printf("Please input the port of the server you want to connect:\n");
     scanf("%d",&service_port);
 
-    fprintf(f, "Send :\n");
     memset(&myaddr, 0, sizeof(myaddr));
     myaddr.sin_family=AF_INET;
     myaddr.sin_addr.s_addr=htonl(INADDR_ANY);
