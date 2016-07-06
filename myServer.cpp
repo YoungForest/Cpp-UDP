@@ -121,6 +121,11 @@ main(int argc, char **argv)
             printf("Find a new client connect.\n");
             pthread_create(&t, NULL, run, &c);
             pthread_join(t, NULL);
+            if(buf[0]!='\0')
+            {
+                strcpy(temp, buf);
+                sprintf(buf, "User-%d : %s", clients[i].id, temp);
+            }
         }
         for(i=0; i<clients.size(); i++) {
             if(remaddr.sin_addr.s_addr != clients[i].client_addr.sin_addr.s_addr) 

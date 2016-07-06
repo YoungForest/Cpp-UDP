@@ -72,15 +72,14 @@ int main(void){
     pthread_create(&threadRecv, NULL, receiveMessage, NULL);
 
     while(1) {
-        if((f = fopen("chat.log","a+"))==NULL)
+        if((f = fopen("client.log","a+"))==NULL)
             printf("Error when fopen\n");
         fgets(buf, BUFLEN, stdin);
         fprintf(f, "%s", buf);
-        if(buf[0]!='\0')
-            if (sendto(sock, buf, strlen(buf), 0, (struct sockaddr *)&remaddr, slen)==-1) {
-                perror("sendto");
-                exit(1);
-            }
+        if (sendto(sock, buf, strlen(buf), 0, (struct sockaddr *)&remaddr, slen)==-1) {
+            perror("sendto");
+            exit(1);
+        }
         /* now receive an acknowledgement from the server */
         fclose(f);
     }
@@ -94,7 +93,7 @@ void * receiveMessage(void * argument)
     char buf[BUFLEN];
     while(1)
     {
-        if((f = fopen("chat.log","a+"))==NULL)
+        if((f = fopen("client.log","a+"))==NULL)
             printf("Error when fopen\n");
         recvlen = recvfrom(sock, buf, BUFLEN, 0, (struct sockaddr *)&remaddr, (unsigned int*)&slen);
         if (recvlen >= 0) {
