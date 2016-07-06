@@ -31,7 +31,7 @@ int main(void){
     char server[IPLEN]; /* "123.206.52.64" "172.16.72.79"*/
     int service_port;
 
-    if((f = fopen("chat.log","a+"))==NULL)
+    if((f = fopen("client.log","a+"))==NULL)
         printf("Error when fopen\n");
 
     printf("Please input the ip of the server you want to connect:\n");
@@ -76,7 +76,7 @@ int main(void){
             printf("Error when fopen\n");
         fgets(buf, BUFLEN, stdin);
         fprintf(f, "%s", buf);
-        if (sendto(sock, buf, strlen(buf), 0, (struct sockaddr *)&remaddr, slen)==-1) {
+        if (sendto(sock, buf, strlen(buf)-1, 0, (struct sockaddr *)&remaddr, slen)==-1) {
             perror("sendto");
             exit(1);
         }
