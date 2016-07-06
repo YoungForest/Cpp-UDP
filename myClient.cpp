@@ -76,7 +76,7 @@ int main(void){
             printf("Error when fopen\n");
         fgets(buf, BUFLEN, stdin);
         fprintf(f, "%s", buf);
-        if (sendto(sock, buf, strlen(buf)-1, 0, (struct sockaddr *)&remaddr, slen)==-1) {
+        if (sendto(sock, buf, strlen(buf), 0, (struct sockaddr *)&remaddr, slen)==-1) {
             perror("sendto");
             exit(1);
         }

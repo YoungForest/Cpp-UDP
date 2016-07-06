@@ -83,9 +83,16 @@ main(int argc, char **argv)
         socklen_t addrlen = sizeof(remaddr);        /* length of addresses */
         printf("waiting on port %d\n", service_port);
         strcpy(buf, "\0");
+        printf("%s", buf);
         recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
         int i;
         printf("%s", buf);
+        for(i=0; i<strlen(buf); i++)
+            if(buf[i] == '\n')
+            {
+                buf[i] = '\0';
+                break;
+            }
         for(i=0; i<clients.size(); i++) {
             if(remaddr.sin_addr.s_addr == clients[i].client_addr.sin_addr.s_addr) 
             {
