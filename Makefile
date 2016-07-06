@@ -10,4 +10,4 @@ myClient: myClient.cpp
 	$(CC) myClient.cpp -o myClient $(LIBS)
 
 clean:
-	rm -f myClient myServer
+	rm -f myClient myServer *.log

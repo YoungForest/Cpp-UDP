@@ -55,7 +55,7 @@ main(int argc, char **argv)
     int service_port;
     vector<Client> clients;
 
-    if((f = fopen("chat.log","a+"))==NULL)
+    if((f = fopen("server.log","a+"))==NULL)
         printf("Error when fopen\n");
 
     printf("Which port do you want to bind?\n");
@@ -81,6 +81,7 @@ main(int argc, char **argv)
     while(1) {
         socklen_t addrlen = sizeof(remaddr);        /* length of addresses */
         printf("waiting on port %d\n", service_port);
+        strcpy(buf,"\0");
         
         recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
         int i;
@@ -125,7 +126,7 @@ void * run(void *arg)
     struct Client *c = (struct Client *)arg;
     char client_buf[BUFSIZE];
     strcpy(client_buf, "Hi, new guy! Welcome to our chat room!");
-    printf("%s\n", client_buf);
+    // printf("%s\n", client_buf);
     if (sendto(c->fd, client_buf, strlen(client_buf), 0, (struct sockaddr *)&c->client_addr, c->addrlen) < 0)
         perror("sendto");
 }
