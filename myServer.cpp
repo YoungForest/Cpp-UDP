@@ -83,7 +83,6 @@ main(int argc, char **argv)
         printf("waiting on port %d\n", service_port);
         
         recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
-        fprintf(f, "%s", buf);
         int i;
         for(i=0; i<clients.size(); i++) {
             if(remaddr.sin_addr.s_addr == clients[i].client_addr.sin_addr.s_addr) 
@@ -93,6 +92,7 @@ main(int argc, char **argv)
                 break;
             }
         }
+        fprintf(f, "%s", buf);
         if(i == clients.size()) {
             struct Client c;
             c.fd = fd;
@@ -104,19 +104,16 @@ main(int argc, char **argv)
             strcpy(c.name, "unamed");
             clients.push_back(c);
             pthread_t t;
-            printf("A new client connects.\n");
+            printf("Find a new client connect.\n");
             pthread_create(&t, NULL, run, &c);
             pthread_join(t, NULL);
         }
-        else
-        {
-            for(i=0; i<clients.size(); i++) {
-                if(remaddr.sin_addr.s_addr != clients[i].client_addr.sin_addr.s_addr) 
-                {
-                    struct Client *c = &clients[i];
-                    if (sendto(c->fd, buf, strlen(buf), 0, (struct sockaddr *)&c->client_addr, c->addrlen) < 0)
-                        perror("sendto");
-                }
+        for(i=0; i<clients.size(); i++) {
+            if(remaddr.sin_addr.s_addr != clients[i].client_addr.sin_addr.s_addr) 
+            {
+                struct Client *c = &clients[i];
+                if (sendto(c->fd, buf, strlen(buf), 0, (struct sockaddr *)&c->client_addr, c->addrlen) < 0)
+                    perror("sendto");
             }
         }
     }
