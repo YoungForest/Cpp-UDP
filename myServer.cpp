@@ -82,6 +82,7 @@ main(int argc, char **argv)
     while(1) {
         socklen_t addrlen = sizeof(remaddr);        /* length of addresses */
         printf("waiting on port %d\n", service_port);
+        printf("%s", buf);
         recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
         int i;
         printf("%s", buf);
