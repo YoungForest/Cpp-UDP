@@ -53,6 +53,7 @@ main(int argc, char **argv)
     int msgcnt = 0;         /* count # of messages we received */
     // unsigned 
     int service_port;
+    char temp[BUFSIZE];
     vector<Client> clients;
 
     if((f = fopen("server.log","a+"))==NULL)
@@ -81,16 +82,15 @@ main(int argc, char **argv)
     while(1) {
         socklen_t addrlen = sizeof(remaddr);        /* length of addresses */
         printf("waiting on port %d\n", service_port);
-        strcpy(buf,"\0");
-        
         recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
         int i;
         printf("%s", buf);
         for(i=0; i<clients.size(); i++) {
             if(remaddr.sin_addr.s_addr == clients[i].client_addr.sin_addr.s_addr) 
             {
+                strcpy(temp, buf);
+                sprintf(buf, "User-%d : %s", clients[i].id, temp);
                 printf("%s", buf);
-                sprintf(buf, "User-%d : %s", clients[i].id, buf);
                 break;
             }
         }
