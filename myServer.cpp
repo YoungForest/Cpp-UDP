@@ -85,15 +85,17 @@ main(int argc, char **argv)
         
         recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
         int i;
+        printf("%s", buf);
         for(i=0; i<clients.size(); i++) {
             if(remaddr.sin_addr.s_addr == clients[i].client_addr.sin_addr.s_addr) 
             {
-                // printf("equal\n");
+                printf("%s", buf);
                 sprintf(buf, "User-%d : %s", clients[i].id, buf);
                 break;
             }
         }
         fprintf(f, "%s", buf);
+        // printf("clients.size() : %d\n", clients.size());
         if(i == clients.size()) {
             struct Client c;
             c.fd = fd;
