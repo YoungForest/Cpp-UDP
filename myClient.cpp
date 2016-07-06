@@ -76,10 +76,11 @@ int main(void){
             printf("Error when fopen\n");
         fgets(buf, BUFLEN, stdin);
         fprintf(f, "%s", buf);
-        if (sendto(sock, buf, strlen(buf), 0, (struct sockaddr *)&remaddr, slen)==-1) {
-            perror("sendto");
-            exit(1);
-        }
+        if(buf[0]!='\0')
+            if (sendto(sock, buf, strlen(buf), 0, (struct sockaddr *)&remaddr, slen)==-1) {
+                perror("sendto");
+                exit(1);
+            }
         /* now receive an acknowledgement from the server */
         fclose(f);
     }

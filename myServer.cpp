@@ -83,10 +83,10 @@ main(int argc, char **argv)
         socklen_t addrlen = sizeof(remaddr);        /* length of addresses */
         printf("waiting on port %d\n", service_port);
         strcpy(buf, "\0");
-        printf("%s", buf);
+        // printf("%s", buf);
         recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
         int i;
-        printf("%s", buf);
+        // printf("%s", buf);
         for(i=0; i<strlen(buf); i++)
             if(buf[i] == '\n')
             {
@@ -98,11 +98,14 @@ main(int argc, char **argv)
             {
                 strcpy(temp, buf);
                 sprintf(buf, "User-%d : %s", clients[i].id, temp);
-                printf("%s", buf);
+                // printf("%s", buf);
                 break;
             }
         }
+        if((f = fopen("server.log","a+"))==NULL)
+            printf("Error when fopen\n");
         fprintf(f, "%s", buf);
+        fclose(f);
         // printf("clients.size() : %d\n", clients.size());
         if(i == clients.size()) {
             struct Client c;
@@ -123,8 +126,9 @@ main(int argc, char **argv)
             if(remaddr.sin_addr.s_addr != clients[i].client_addr.sin_addr.s_addr) 
             {
                 struct Client *c = &clients[i];
-                if (sendto(c->fd, buf, strlen(buf), 0, (struct sockaddr *)&c->client_addr, c->addrlen) < 0)
-                    perror("sendto");
+                if(buf[0]!='\0')
+                    if (sendto(c->fd, buf, strlen(buf), 0, (struct sockaddr *)&c->client_addr, c->addrlen) < 0)
+                        perror("sendto");
             }
         }
     }
@@ -135,8 +139,15 @@ void * run(void *arg)
 {
     struct Client *c = (struct Client *)arg;
     char client_buf[BUFSIZE];
+    FILE *f;
+    if((f = fopen("server.log","a+"))==NULL)
+        printf("Error when fopen\n");
     strcpy(client_buf, "Hi, new guy! Welcome to our chat room!");
     // printf("%s\n", client_buf);
     if (sendto(c->fd, client_buf, strlen(client_buf), 0, (struct sockaddr *)&c->client_addr, c->addrlen) < 0)
         perror("sendto");
+    sprintf(client_buf, "User : %d join.", c->id);
+    printf("%s\n", client_buf);
+    fprintf(f, "%s\n", client_buf);
+    fclose(f);
 }
